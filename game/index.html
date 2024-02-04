@@ -1,10 +1,956 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" href="./game_files/jquery-ui.css">
+<script src="./game_files/jquery-1.9.1.js"></script>
+<script src="./game_files/jquery-ui.js"></script>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	font-size: 100%;
+	background-color: #ffffff;
+	background-image: url("https://www.transparenttextures.com/patterns/green-fibers.png");
+	overflow: hidden;
+}
+.circle {
+	display: inline-block;
+	padding: .35rem;
+	width: 4.5rem;
+	height: 4.5rem;
+	margin: .35rem;
+	font-size: 0;
+	box-shadow: inset 0 0 1rem #000;
+	border-radius: 50%;
+	background-color: #444444;
+	background-image: url("https://www.transparenttextures.com/patterns/brushed-alum-dark.png");
+}
+.ball {
+  width: 4.5rem;
+	height: 4.5rem;
+  display: inline-block;
+	border-radius: 50%;
+}
+.b2color1 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #d8f3dc 3%, #52b788 60%, #081c15 100%);
+}
+.b2color2 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #fadde1 3%, #ffa6c1 60%, #ff5d8f 100%);
+}
+.b2color3 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #e0aaff 3%, #5a189a 60%, #10002b 100%);
+}
+.b2color4 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #3457FC 3%, #11299B 60%, #011367 100%);
+}
+.b2color5 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #ffea00 3%, #ffaa00 60%, #ff7b00 100%);
+}
+.b2color6 {
+  background: radial-gradient(circle at 65% 15%, white 1px, #fe938c 3%, #b21e35 60%, #641220 100%);
+}
+#gameZone {
+	text-align: center;
+	margin: 2rem auto 2rem auto;
+}
+.ball-box-warpper {
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 1rem;
+	font-size: 0;
+}
+.ball-box-result {
+	position: relative;
+	padding: .5rem;
+	margin-bottom: 1rem;
+	width: 7rem;
+	height: 7rem;
+	border-radius: 2.5rem;
+	box-shadow: inset 0 0 .5rem #333;
+	background-color: #999999;
+	display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+	background-image: url("./resources/dark-leather.png");
+}
+.ball-box {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: .5rem;
+	width: 7rem;
+	height: 28rem;
+	border-radius: 1rem;
+	box-shadow: inset 0 0 1rem #000;
+	background-color: #999999;
+	background-image: url("./resources/dark-leather.png");
+}
+#gameZone .circle {
+	margin: .7rem .5rem;
+}
+#waiting {
+	margin: 0 auto;
+	margin-top: 20px;
+	padding: 10px 0;
+	width: 55rem;
+  text-align: center;
+	border-radius: 1.5rem;
+	background-color: #999999;
+	background-image: url("./resources/dark-leather.png");
+}
+.button-warpper {
+	flex: 0 0 50%;
+}
+.button {
+	display: inline-block;
+	width: 1.8rem;
+	height: 1.8rem;
+	margin: auto;
+	font-size: 0;
+	border: 2px solid #000;
+	box-shadow: inset 0 0 1.5rem #000;
+	border-radius: 50%;
+	background-color: #444444;
+}
+.button.all-right {
+	background-color: #FF5A18;
+	box-shadow: none;
+	width: 2.5rem;
+	height: 2.5rem;
+}
+.button.half-right {
+	background-color: #ddd;
+	box-shadow: none;
+	width: 2.5rem;
+	height: 2.5rem;
+}
+.i-am-ok {
+	display: none;
+	cursor: pointer;
+	position: absolute;
+	font-size: 4rem;
+	line-height: 7rem;
+	text-align: center;
+	background-color: #6cc46f;
+	font-weight: bolder;
+	box-shadow: 0 0 0 .2rem #fff;
+	color: #fff;
+	top: 0;
+	left: 0;
+	width: 7rem;
+	height: 7rem;
+	padding: .5rem;
+	border-radius: 2.5rem;
+}
+.show {
+	display: block;
+}
+#help {
+	display: block;
+	cursor: pointer;
+	position: fixed;
+	width: 5rem;
+	height: 5rem;
+	right: 2rem;
+	top: 1rem;
+	color: red;
+	font-size: 4rem;
+	line-height: 5rem;
+	text-align: center;
+	background-color: #fff;
+	border: 1px solid #333;
+	border-radius: 50%;
+}
+a:link, a:active, a:hover, a:visited { text-decoration: none;}
+#mask {
+	position: fixed;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(255, 255, 255, .7);
+	z-index: 100;
+	opacity: 1;
+	transition: opacity 2s;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#mask .game-start {
+	font-size: 8rem;
+}
+#mask.get-out {
+	opacity: 0;
+}
+
+#mask.dark {
+	opacity: 1;
+	background-color: rgba(0, 0, 0, .7);
+}
+
+#mask.dark .game-start {
+	display: none;
+}
+
+.game-winner {
+	font-size: 8rem;
+	color: #fff;
+	display: none;
+}
+
+#mask.dark .game-start {
+	display: none;
+}
+
+#mask.dark .game-winner {
+	display: block;
+}
+
+#mask.dark+.pyro {
+	display: block;
+}
+
+.pyro {
+	display: none;
+	position: fixed;
+  width: 100vw;
+  height: 100vh;
+	z-index: 1000;
+}
+
+.pyro > .before, .pyro > .after {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff;
+  -moz-animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+  -webkit-animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+  -o-animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+  -ms-animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+  animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+}
+
+.pyro > .after {
+  -moz-animation-delay: 1.25s, 1.25s, 1.25s;
+  -webkit-animation-delay: 1.25s, 1.25s, 1.25s;
+  -o-animation-delay: 1.25s, 1.25s, 1.25s;
+  -ms-animation-delay: 1.25s, 1.25s, 1.25s;
+  animation-delay: 1.25s, 1.25s, 1.25s;
+  -moz-animation-duration: 1.25s, 1.25s, 6.25s;
+  -webkit-animation-duration: 1.25s, 1.25s, 6.25s;
+  -o-animation-duration: 1.25s, 1.25s, 6.25s;
+  -ms-animation-duration: 1.25s, 1.25s, 6.25s;
+  animation-duration: 1.25s, 1.25s, 6.25s;
+}
+
+@-webkit-keyframes bang {
+  to {
+    box-shadow: 54px -276.6666666667px #2f00ff, 245px -332.6666666667px #d5ff00, -33px -269.6666666667px #ff1a00, -20px -380.6666666667px #0095ff, 81px -70.6666666667px #ff005e, -209px -19.6666666667px #ff005e, 143px -104.6666666667px #00c4ff, -244px -261.6666666667px #ffd900, 66px 65.3333333333px #00ff51, -145px -405.6666666667px #0900ff, 103px -358.6666666667px #00fbff, -214px -156.6666666667px #88ff00, -107px -172.6666666667px #ff0033, -40px -201.6666666667px #7700ff, -177px -251.6666666667px #ffdd00, -64px -211.6666666667px #ff1e00, 138px -70.6666666667px #e1ff00, -61px -185.6666666667px #6aff00, 153px -185.6666666667px #00aaff, 157px 17.3333333333px #6aff00, -109px -107.6666666667px #59ff00, 104px -263.6666666667px #ea00ff, -155px 41.3333333333px #00ff59, 192px -40.6666666667px #0059ff, -112px -242.6666666667px #ff0900, 1px -298.6666666667px #0009ff, 37px -295.6666666667px #ff5900, 208px -380.6666666667px #00ff99, -111px -3.6666666667px #fff200, 238px -266.6666666667px #ff0095, -8px 59.3333333333px #00ff22, -174px -93.6666666667px #5eff00, 149px -218.6666666667px #00aeff, 239px -296.6666666667px #0077ff, 97px -322.6666666667px #0d00ff, -239px -232.6666666667px #ff3c00, 235px -62.6666666667px #ff0033, -70px -153.6666666667px #ff00ae, 54px 63.3333333333px #2b00ff, -141px -267.6666666667px #ff0044, -222px -71.6666666667px #ff0009, 177px -96.6666666667px #ff0073, -107px 29.3333333333px #00ffd9, 184px -116.6666666667px #ff00c8, 77px -16.6666666667px #00ff04, -214px 48.3333333333px #8400ff, 22px -407.6666666667px #ffaa00, -174px -252.6666666667px #00ff0d, -121px -337.6666666667px #6f00ff, 205px -205.6666666667px #00fff7, -4px 39.3333333333px #ff003c;
+  }
+}
+@-moz-keyframes bang {
+  to {
+    box-shadow: 54px -276.6666666667px #2f00ff, 245px -332.6666666667px #d5ff00, -33px -269.6666666667px #ff1a00, -20px -380.6666666667px #0095ff, 81px -70.6666666667px #ff005e, -209px -19.6666666667px #ff005e, 143px -104.6666666667px #00c4ff, -244px -261.6666666667px #ffd900, 66px 65.3333333333px #00ff51, -145px -405.6666666667px #0900ff, 103px -358.6666666667px #00fbff, -214px -156.6666666667px #88ff00, -107px -172.6666666667px #ff0033, -40px -201.6666666667px #7700ff, -177px -251.6666666667px #ffdd00, -64px -211.6666666667px #ff1e00, 138px -70.6666666667px #e1ff00, -61px -185.6666666667px #6aff00, 153px -185.6666666667px #00aaff, 157px 17.3333333333px #6aff00, -109px -107.6666666667px #59ff00, 104px -263.6666666667px #ea00ff, -155px 41.3333333333px #00ff59, 192px -40.6666666667px #0059ff, -112px -242.6666666667px #ff0900, 1px -298.6666666667px #0009ff, 37px -295.6666666667px #ff5900, 208px -380.6666666667px #00ff99, -111px -3.6666666667px #fff200, 238px -266.6666666667px #ff0095, -8px 59.3333333333px #00ff22, -174px -93.6666666667px #5eff00, 149px -218.6666666667px #00aeff, 239px -296.6666666667px #0077ff, 97px -322.6666666667px #0d00ff, -239px -232.6666666667px #ff3c00, 235px -62.6666666667px #ff0033, -70px -153.6666666667px #ff00ae, 54px 63.3333333333px #2b00ff, -141px -267.6666666667px #ff0044, -222px -71.6666666667px #ff0009, 177px -96.6666666667px #ff0073, -107px 29.3333333333px #00ffd9, 184px -116.6666666667px #ff00c8, 77px -16.6666666667px #00ff04, -214px 48.3333333333px #8400ff, 22px -407.6666666667px #ffaa00, -174px -252.6666666667px #00ff0d, -121px -337.6666666667px #6f00ff, 205px -205.6666666667px #00fff7, -4px 39.3333333333px #ff003c;
+  }
+}
+@-o-keyframes bang {
+  to {
+    box-shadow: 54px -276.6666666667px #2f00ff, 245px -332.6666666667px #d5ff00, -33px -269.6666666667px #ff1a00, -20px -380.6666666667px #0095ff, 81px -70.6666666667px #ff005e, -209px -19.6666666667px #ff005e, 143px -104.6666666667px #00c4ff, -244px -261.6666666667px #ffd900, 66px 65.3333333333px #00ff51, -145px -405.6666666667px #0900ff, 103px -358.6666666667px #00fbff, -214px -156.6666666667px #88ff00, -107px -172.6666666667px #ff0033, -40px -201.6666666667px #7700ff, -177px -251.6666666667px #ffdd00, -64px -211.6666666667px #ff1e00, 138px -70.6666666667px #e1ff00, -61px -185.6666666667px #6aff00, 153px -185.6666666667px #00aaff, 157px 17.3333333333px #6aff00, -109px -107.6666666667px #59ff00, 104px -263.6666666667px #ea00ff, -155px 41.3333333333px #00ff59, 192px -40.6666666667px #0059ff, -112px -242.6666666667px #ff0900, 1px -298.6666666667px #0009ff, 37px -295.6666666667px #ff5900, 208px -380.6666666667px #00ff99, -111px -3.6666666667px #fff200, 238px -266.6666666667px #ff0095, -8px 59.3333333333px #00ff22, -174px -93.6666666667px #5eff00, 149px -218.6666666667px #00aeff, 239px -296.6666666667px #0077ff, 97px -322.6666666667px #0d00ff, -239px -232.6666666667px #ff3c00, 235px -62.6666666667px #ff0033, -70px -153.6666666667px #ff00ae, 54px 63.3333333333px #2b00ff, -141px -267.6666666667px #ff0044, -222px -71.6666666667px #ff0009, 177px -96.6666666667px #ff0073, -107px 29.3333333333px #00ffd9, 184px -116.6666666667px #ff00c8, 77px -16.6666666667px #00ff04, -214px 48.3333333333px #8400ff, 22px -407.6666666667px #ffaa00, -174px -252.6666666667px #00ff0d, -121px -337.6666666667px #6f00ff, 205px -205.6666666667px #00fff7, -4px 39.3333333333px #ff003c;
+  }
+}
+@-ms-keyframes bang {
+  to {
+    box-shadow: 54px -276.6666666667px #2f00ff, 245px -332.6666666667px #d5ff00, -33px -269.6666666667px #ff1a00, -20px -380.6666666667px #0095ff, 81px -70.6666666667px #ff005e, -209px -19.6666666667px #ff005e, 143px -104.6666666667px #00c4ff, -244px -261.6666666667px #ffd900, 66px 65.3333333333px #00ff51, -145px -405.6666666667px #0900ff, 103px -358.6666666667px #00fbff, -214px -156.6666666667px #88ff00, -107px -172.6666666667px #ff0033, -40px -201.6666666667px #7700ff, -177px -251.6666666667px #ffdd00, -64px -211.6666666667px #ff1e00, 138px -70.6666666667px #e1ff00, -61px -185.6666666667px #6aff00, 153px -185.6666666667px #00aaff, 157px 17.3333333333px #6aff00, -109px -107.6666666667px #59ff00, 104px -263.6666666667px #ea00ff, -155px 41.3333333333px #00ff59, 192px -40.6666666667px #0059ff, -112px -242.6666666667px #ff0900, 1px -298.6666666667px #0009ff, 37px -295.6666666667px #ff5900, 208px -380.6666666667px #00ff99, -111px -3.6666666667px #fff200, 238px -266.6666666667px #ff0095, -8px 59.3333333333px #00ff22, -174px -93.6666666667px #5eff00, 149px -218.6666666667px #00aeff, 239px -296.6666666667px #0077ff, 97px -322.6666666667px #0d00ff, -239px -232.6666666667px #ff3c00, 235px -62.6666666667px #ff0033, -70px -153.6666666667px #ff00ae, 54px 63.3333333333px #2b00ff, -141px -267.6666666667px #ff0044, -222px -71.6666666667px #ff0009, 177px -96.6666666667px #ff0073, -107px 29.3333333333px #00ffd9, 184px -116.6666666667px #ff00c8, 77px -16.6666666667px #00ff04, -214px 48.3333333333px #8400ff, 22px -407.6666666667px #ffaa00, -174px -252.6666666667px #00ff0d, -121px -337.6666666667px #6f00ff, 205px -205.6666666667px #00fff7, -4px 39.3333333333px #ff003c;
+  }
+}
+@keyframes bang {
+  to {
+    box-shadow: 54px -276.6666666667px #2f00ff, 245px -332.6666666667px #d5ff00, -33px -269.6666666667px #ff1a00, -20px -380.6666666667px #0095ff, 81px -70.6666666667px #ff005e, -209px -19.6666666667px #ff005e, 143px -104.6666666667px #00c4ff, -244px -261.6666666667px #ffd900, 66px 65.3333333333px #00ff51, -145px -405.6666666667px #0900ff, 103px -358.6666666667px #00fbff, -214px -156.6666666667px #88ff00, -107px -172.6666666667px #ff0033, -40px -201.6666666667px #7700ff, -177px -251.6666666667px #ffdd00, -64px -211.6666666667px #ff1e00, 138px -70.6666666667px #e1ff00, -61px -185.6666666667px #6aff00, 153px -185.6666666667px #00aaff, 157px 17.3333333333px #6aff00, -109px -107.6666666667px #59ff00, 104px -263.6666666667px #ea00ff, -155px 41.3333333333px #00ff59, 192px -40.6666666667px #0059ff, -112px -242.6666666667px #ff0900, 1px -298.6666666667px #0009ff, 37px -295.6666666667px #ff5900, 208px -380.6666666667px #00ff99, -111px -3.6666666667px #fff200, 238px -266.6666666667px #ff0095, -8px 59.3333333333px #00ff22, -174px -93.6666666667px #5eff00, 149px -218.6666666667px #00aeff, 239px -296.6666666667px #0077ff, 97px -322.6666666667px #0d00ff, -239px -232.6666666667px #ff3c00, 235px -62.6666666667px #ff0033, -70px -153.6666666667px #ff00ae, 54px 63.3333333333px #2b00ff, -141px -267.6666666667px #ff0044, -222px -71.6666666667px #ff0009, 177px -96.6666666667px #ff0073, -107px 29.3333333333px #00ffd9, 184px -116.6666666667px #ff00c8, 77px -16.6666666667px #00ff04, -214px 48.3333333333px #8400ff, 22px -407.6666666667px #ffaa00, -174px -252.6666666667px #00ff0d, -121px -337.6666666667px #6f00ff, 205px -205.6666666667px #00fff7, -4px 39.3333333333px #ff003c;
+  }
+}
+@-webkit-keyframes gravity {
+  to {
+    transform: translateY(200px);
+    -moz-transform: translateY(200px);
+    -webkit-transform: translateY(200px);
+    -o-transform: translateY(200px);
+    -ms-transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@-moz-keyframes gravity {
+  to {
+    transform: translateY(200px);
+    -moz-transform: translateY(200px);
+    -webkit-transform: translateY(200px);
+    -o-transform: translateY(200px);
+    -ms-transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@-o-keyframes gravity {
+  to {
+    transform: translateY(200px);
+    -moz-transform: translateY(200px);
+    -webkit-transform: translateY(200px);
+    -o-transform: translateY(200px);
+    -ms-transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@-ms-keyframes gravity {
+  to {
+    transform: translateY(200px);
+    -moz-transform: translateY(200px);
+    -webkit-transform: translateY(200px);
+    -o-transform: translateY(200px);
+    -ms-transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@keyframes gravity {
+  to {
+    transform: translateY(200px);
+    -moz-transform: translateY(200px);
+    -webkit-transform: translateY(200px);
+    -o-transform: translateY(200px);
+    -ms-transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@-webkit-keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}
+@-moz-keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}
+@-o-keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}
+@-ms-keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}
+@keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}
+
+.ui-dialog-titlebar-close {
+    display: none;
+}
+</style>
 </head>
 <body>
-    Hello World!
-</body>
-</html>
+<a id="help" href="https://km.sankuai.com/page/640939377" target="_blank">?</a>
+<div id="mask"><div class="game-start">游戏开始！</div><div class="game-winner">恭喜通关!</div></div>
+<div class="pyro">
+  <div class="before"></div>
+  <div class="after"></div>
+</div>
+<div id="gameZone">
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="1">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="2">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="3">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="4">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="5">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="6">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="7">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div>
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="8">
+				<div class="circle ui-droppable" data-index="0">
+				</div>
+				<div class="circle ui-droppable" data-index="1">
+				</div>
+				<div class="circle ui-droppable" data-index="2">
+				</div>
+				<div class="circle ui-droppable" data-index="3">
+				</div>
+			</div>
+		</div></div>
+<div id="waiting">
+	<div class="circle">
+		<div class="ball b2color1 ui-draggable" data-id="1"></div>
+	</div>
+	<div class="circle">
+		<div class="ball b2color2 ui-draggable" data-id="2"></div>
+	</div>
+	<div class="circle">
+		<div class="ball b2color3 ui-draggable" data-id="3"></div>
+	</div>
+	<div class="circle">
+		<div class="ball b2color4 ui-draggable" data-id="4"></div>
+	</div>
+	<div class="circle">
+		<div class="ball b2color5 ui-draggable" data-id="5"></div>
+	</div>
+	<div class="circle">
+		<div class="ball b2color6 ui-draggable" data-id="6"></div>
+	</div>
+</div>
+
+<div id="dialog-confirm">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>请选择难度</p>
+  </div>
+
+<script type="text/javascript">
+// 样式做的挺好看的吧！ by fengtianran
+$(function() {
+	let ballBoxNumber = 8;
+	let ballBoxHtml = '';
+	let currentId = 1;
+    let currentResult = [];
+    let  = [];
+	const colorMap = {
+		1: 'R',
+		2: 'G',
+		3: 'Y',
+		4: 'B',
+		5: 'C',
+		6: 'P',
+	};
+	const nameMap = {
+		'R': 1,
+		'G': 2,
+		'Y': 3,
+		'B': 4,
+		'C': 5,
+		'P': 6,
+	}
+
+    function GenComplexResult() {
+        let result = [];
+        for (let i = 1; i <= 4; i++) {
+            const color = Math.floor(Math.random() * 6) + 1;
+            result.push(color);
+        }
+        localStorage.setItem('result', JSON.stringify(result));
+        return result;
+    }
+
+    function GenResult() {
+        const result = [1,2,3,4,5,6].sort(function() {
+            return .5 - Math.random();
+        }).slice(0, 4);
+        localStorage.setItem('result', JSON.stringify(result));
+        return result;
+    }
+
+    function CheckResult(answer) {
+        const hits = answer.filter((color, i) => {
+            return color === currentResult[i];
+        }).length;
+        function countSameElements(arr1, arr2) {
+            let count = 0;
+            
+            for (let i = 0; i < arr1.length; i++) {
+                for (let j = 0; j < arr2.length; j++) {
+                    if (arr1[i] === arr2[j]) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+            return count;
+        }
+
+        const pseudoHits = countSameElements(answer, currentResult);
+
+        records.push({
+            answer: answer.join(''),
+            hits,
+            pseudoHits,
+        });
+
+        localStorage.setItem('records', hits === 4 ? '' : JSON.stringify(records));
+
+        console.log('currentResult', currentResult, answer);
+
+        return {
+            hits,
+            pseudoHits
+        };
+    }
+
+	const answer = {};
+	while(ballBoxNumber--) {
+		ballBoxHtml += `
+		<div class="ball-box-warpper">
+			<div class="ball-box-result">
+				<div class="i-am-ok">OK</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+				<div class="button-warpper">
+					<div class="button">
+					</div>
+				</div>
+			</div>
+			<div class="ball-box" data-id="${8 - ballBoxNumber}">
+				<div class="circle" data-index="0">
+				</div>
+				<div class="circle" data-index="1">
+				</div>
+				<div class="circle" data-index="2">
+				</div>
+				<div class="circle" data-index="3">
+				</div>
+			</div>
+		</div>`;
+	}
+	document.getElementById('gameZone').innerHTML = ballBoxHtml;
+	function isOk() {
+		const currentAnswer = answer[currentId];
+		return currentAnswer && Array.isArray(currentAnswer) && currentAnswer.length === 4 && currentAnswer.every(item => !!item);
+	}
+  $("#waiting .ball").draggable({ opacity: 0.7, helper: "clone" });
+	$( ".ball-box .circle" ).droppable({
+	  drop: function(e, ui) {
+			const draggableElId = ui.draggable.data('id');
+			const $el = $(this);
+			const id = $el.parent().data('id');
+			const elIndex = $el.data('index');
+			if (currentId !== id) {
+				alert(`请选择第${currentId}列进行展示`);
+				return ;
+			}
+			answer[id] = answer[id] || [false, false, false, false];
+			answer[id][elIndex] = draggableElId;
+			$el.html(`<div class="ball b2color${draggableElId}" data-id="${draggableElId}"></div>`);
+			if (isOk()) {
+				$('.i-am-ok')[currentId - 1].classList.add('show');
+			}
+	  }
+	});
+	$('.i-am-ok').on('click', function() {
+		let result;
+        const data = CheckResult(answer[currentId]);
+        if (data.hits === 4) {
+            setTimeout(() => {
+                $('#mask').removeClass('get-out').addClass('dark');
+                $('#mask').show();
+                setTimeout(() => {
+                }, 2000);
+            }, 100);
+        }
+        let resultList = [];
+        data.pseudoHits = data.pseudoHits - data.hits;
+        while(data.hits--) {
+            resultList.push('all-right');
+        }
+        while(data.pseudoHits--) {
+            resultList.push('half-right');
+        }
+        resultList = resultList.slice(0, 4);
+        resultList.forEach((className, index) => {
+            $('.button-warpper .button')[(currentId - 1) * 4 + index].classList.add(className);
+        });
+
+        $(this).removeClass('show');
+        currentId++;
+	});
+
+	$('#mask').click(function() {
+        records = JSON.parse(localStorage.getItem('records') || '[]');
+        if (records.length === 0) {
+            const that = this;
+            $( "#dialog-confirm" ).dialog({
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: {
+                        "困难模式": function() {
+                            currentResult = GenComplexResult();
+                            $(that).addClass('get-out');
+                            setTimeout(() => {
+                                $(that).hide();
+                            }, 2000);
+                            $( this ).dialog( "close" );
+                            return ;
+                        },
+                        "简单模式": function() {
+                            currentResult = GenResult();
+                            $(that).addClass('get-out');
+                            setTimeout(() => {
+                                $(that).hide();
+                            }, 2000);
+                            $( this ).dialog( "close" );
+                            return ;
+                        }
+                    }
+            });
+            return ;
+            
+        }
+        currentResult = JSON.parse(localStorage.getItem('result'));
+        currentId = records.length + 1;
+        records.forEach((record, index) => {
+            const currentIndex = index + 1;
+            const parent = $($('.ball-box-warpper')[index]);
+            const circles = parent.find('.circle');
+            const answers = record.answer.split('');
+            $(circles[0]).html(`<div class="ball b2color${answers[0]}" data-id="${answers[0]}"></div>`);
+            $(circles[1]).html(`<div class="ball b2color${answers[1]}" data-id="${answers[1]}"></div>`);
+            $(circles[2]).html(`<div class="ball b2color${answers[2]}" data-id="${answers[2]}"></div>`);
+            $(circles[3]).html(`<div class="ball b2color${answers[3]}" data-id="${answers[3]}"></div>`);
+
+            let resultList = [];
+            record.pseudoHits = record.pseudoHits - record.hits;
+            while(record.hits--) {
+                resultList.push('all-right');
+            }
+            while(record.pseudoHits--) {
+                resultList.push('half-right');
+            }
+            resultList = resultList.slice(0, 4);
+            resultList.forEach((className, index) => {
+                $('.button-warpper .button')[(currentIndex - 1) * 4 + index].classList.add(className);
+            });
+        })
+
+		$(this).addClass('get-out');
+		setTimeout(() => {
+			$(this).hide();
+		}, 2000);
+	});
+});
+</script>
+
+
+</body></html>
