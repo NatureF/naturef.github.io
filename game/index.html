@@ -750,6 +750,11 @@ $(function() {
             const color = Math.floor(Math.random() * 6) + 1;
             result.push(color);
         }
+		if ((new Set(result)).size === 4) {
+			console.log('result', result);
+			result = GenComplexResult();
+		}
+		console.log('result fin', result);
         localStorage.setItem('result', JSON.stringify(result));
         return result;
     }
